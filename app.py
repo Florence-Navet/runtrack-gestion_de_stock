@@ -1,5 +1,5 @@
 from tkinter import *
-import tkinter.ttk as ttk  # Importer ttk pour utiliser Treeview
+import tkinter.ttk as ttk  # Importer ttk pour utiliser Combobox
 from mangaStore import MangaStore
 
 # Fenêtre 1: Créer la fenêtre principale
@@ -85,10 +85,11 @@ def ouvrir_boutique():
             description = entry_description.get()
             price = float(entry_price.get())
             quantity = int(entry_quantity.get())
-            category_id = int(entry_category.get())
+            # Récupérer l'ID de la catégorie sélectionnée
+            category_id = category_combobox.get()  # Nous utilisons la valeur sélectionnée dans le combobox
 
             # Ajouter le produit
-            store.ajouter_produit(name, description, price, quantity, category_id)
+            store.ajouter_produit(name, description, price, quantity, int(category_id))
 
             # Fermer la fenêtre du formulaire
             ajout_fenetre.destroy()
@@ -96,7 +97,7 @@ def ouvrir_boutique():
         # Fenêtre 3: Créer une fenêtre pour saisir les informations du produit
         ajout_fenetre = Toplevel(nouvelle_fenetre)
         ajout_fenetre.title("Ajouter un produit")
-        ajout_fenetre.geometry("720x450")
+        ajout_fenetre.geometry("1080x720")
 
         # Créer les champs de saisie avec la police Consolas et taille de police plus grande
         label_name = Label(ajout_fenetre, text="Nom du produit:", font=("Consolas", 20))
@@ -119,10 +120,26 @@ def ouvrir_boutique():
         entry_quantity = Entry(ajout_fenetre, font=("Consolas", 20))
         entry_quantity.pack(pady=10)
 
-        label_category = Label(ajout_fenetre, text="ID de la catégorie:", font=("Consolas", 20))
+        # Créer le combobox pour la sélection de la catégorie avec une police Consolas et taille de police plus grande
+        label_category = Label(ajout_fenetre, text="Sélectionner la catégorie:", font=("Consolas", 20))
         label_category.pack(pady=10)
-        entry_category = Entry(ajout_fenetre, font=("Consolas", 20))
-        entry_category.pack(pady=10)
+
+        # Liste des catégories avec leurs ID
+        categories = [
+            ("Manga Shonen", 1),
+            ("Manga Shojo", 2),
+            ("Manga Seinen", 3),
+            ("Goodies", 4),
+            ("Figurines", 5)
+        ]
+
+        # Extraire uniquement les noms pour les afficher dans le Combobox
+        category_names = [cat[0] for cat in categories]
+
+        # Créer un Combobox pour la sélection de la catégorie
+        category_combobox = ttk.Combobox(ajout_fenetre, values=category_names, font=("Consolas", 20))
+        category_combobox.pack(pady=10)
+        category_combobox.set("Sélectionner une catégorie")  # Valeur par défaut
 
         # Bouton pour ajouter le produit avec police Consolas et taille plus grande
         bouton_ajouter = Button(ajout_fenetre, text="Ajouter", command=ajouter, font=("Consolas", 20))

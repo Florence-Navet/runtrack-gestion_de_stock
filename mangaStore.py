@@ -1,14 +1,24 @@
 import mysql.connector
 
 class MangaStore:
+    """
+    Classe pour gérer un magasin de mangas avec une base de données MySQL.
+
+    TODO:
+    - Modification d'un produit : Sélectionnez un produit et modifiez ses informations via un formulaire.
+    - Suppression d'un produit : Sélectionnez un produit et supprimez-le de la base de données.
+    - Filtrage par catégorie : Sélectionnez une catégorie pour afficher uniquement les produits de cette catégorie.
+    - Exportation en CSV : Cliquez sur un bouton pour exporter les produits en format CSV.
+    """
+
     def __init__(self):
         """Connexion à la base de données MySQL."""
         try:
             self.db = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",  
-                database="mangastore"  
+                password="",
+                database="mangastore"
             )
             self.cursor = self.db.cursor()
             print("Connexion réussie à MySQL !")
@@ -55,7 +65,7 @@ class MangaStore:
                 self.cursor.execute("SELECT COUNT(*) FROM category WHERE name = %s", (category,))
                 if self.cursor.fetchone()[0] == 0:
                     self.cursor.execute("INSERT INTO category (name) VALUES (%s)", (category,))
-            
+
             self.db.commit()
 
             # Vérification des catégories ajoutées
@@ -83,7 +93,7 @@ class MangaStore:
             self.db.commit()
 
             print(f"Produit '{name}' ajouté avec succès !")
-        
+
         except mysql.connector.Error as err:
             print(f"Erreur MySQL : {err}")
 
@@ -91,8 +101,8 @@ class MangaStore:
         """Affiche tous les produits du stock et retourne la liste."""
         print("\nExécution de la requête pour afficher les produits...")
         self.cursor.execute("""
-            SELECT product.id, product.name, product.description, product.price, product.quantity, category.name 
-            FROM product 
+            SELECT product.id, product.name, product.description, product.price, product.quantity, category.name
+            FROM product
             JOIN category ON product.id_category = category.id
         """)
         produits = self.cursor.fetchall()
@@ -128,7 +138,7 @@ def menu():
         match choix:
             case "1":
                 store.afficher_produits()
-            
+
             case "2":
                 name = input("Nom du produit : ")
                 description = input("Description : ")
@@ -141,7 +151,7 @@ def menu():
                 print("Fermeture du programme...")
                 store.fermer_connexion()
                 break
-            
+
             case _:
                 print("Option invalide, réessayez.")
 

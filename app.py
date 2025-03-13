@@ -1,35 +1,54 @@
 from tkinter import *
+import tkinter as tk
 
-#creer une premier fenetre
+# Créer la fenêtre principale
 window = Tk()
 
-
-#personnaliser cette fenetre
+# Personnaliser cette fenêtre
 window.title("My MangaStore")
 window.geometry("720x480")
 window.minsize(480,360)
 window.iconbitmap("assets/logo.ico")
 window.config(background='#ab7e9c')
 
-#creation de la frame
+#creation, d'image
+width = 300
+height = 300
+image = PhotoImage(file="assets/anime.png").zoom(35).subsample(32)
+canvas = Canvas(window, width=width, height=height, bg='#ab7e9c', bd = 0, highlightthickness=0)
+canvas.create_image(width/2, height/2, image=image)
+canvas.pack(expand=YES)
+
+# Création de la frame
 frame = Frame(window, bg='#ab7e9c', bd='1', relief=SUNKEN)
 
-#ajouter du premier titre
-label_title = Label(frame, text="Bienvenue dans ma boutique", font=("Courier", 30), bg='#ab7e9c', fg='#FFFFFF')
-# label_title.pack(side=LEFT)
+# Ajouter un premier titre
+label_title = Label(frame, text="Bienvenue dans ma boutique", font=("Courier", 25), bg='#ab7e9c', fg='#FFFFFF')
 label_title.pack()
 
-#ajouter un sous-titre
-label_subtitle = Label(frame, text="MANGASTORE", font=("Courier", 40), bg='#ab7e9c', fg='#FFFFFF')
-# label_title.pack(side=LEFT)
+# Ajouter un sous-titre
+label_subtitle = Label(frame, text="MANGASTORE", font=("Courier", 35), bg='#ab7e9c', fg='#FFFFFF')
 label_subtitle.pack()
 
 
-#ajouter un premier bouton
-yt_button = 
+def ouvrir_boutique():
+    """Fonction pour ouvrir une nouvelle fenêtre."""
+    # Créer une nouvelle fenêtre
+    nouvelle_fenetre = Toplevel()
+    nouvelle_fenetre.title("Nouvelle Boutique")
+    nouvelle_fenetre.geometry("720x480")
+    
+    # Ajouter un label dans la nouvelle fenêtre
+    label = Label(nouvelle_fenetre, text="Bienvenue dans notre boutique !", font=("Courier", 15))
+    label.pack(pady=50)
 
-#ajouter
+
+# Ajouter un premier bouton
+fenetre_button = Button(frame, text="Découvrir boutique", font=("Courier", 18), bg='#FFFFFF', fg='#ab7e9c', command=ouvrir_boutique)
+fenetre_button.pack(side=TOP, pady=10, fill=X)
+
+# Ajouter la frame dans la fenêtre principale
 frame.pack(expand=YES)
 
-#afficher
-window = mainloop()
+# Afficher la fenêtre principale
+window.mainloop()

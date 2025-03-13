@@ -88,7 +88,7 @@ class MangaStore:
             print(f"Erreur MySQL : {err}")
 
     def afficher_produits(self):
-        """Affiche tous les produits du stock."""
+        """Affiche tous les produits du stock et retourne la liste."""
         print("\nExécution de la requête pour afficher les produits...")
         self.cursor.execute("""
             SELECT product.id, product.name, product.description, product.price, product.quantity, category.name 
@@ -99,11 +99,13 @@ class MangaStore:
 
         if not produits:
             print("\nAucun produit trouvé dans la base de données.")
-            return
+            return []  # Retourner une liste vide si aucun produit n'est trouvé
 
         print("\nListe des Produits :")
         for p in produits:
             print(f"ID: {p[0]}, Nom: {p[1]}, Description: {p[2]}, Prix: {p[3]}€, Stock: {p[4]}, Catégorie: {p[5]}")
+
+        return produits  # Retourner les produits pour l'interface graphique
 
     def fermer_connexion(self):
         """Ferme la connexion à la base de données."""
@@ -113,7 +115,7 @@ class MangaStore:
 
 # --- Interface CLI ---
 def menu():
-    print("🛒 Ouverture du magasin !")
+    print("Ouverture du magasin !")
     store = MangaStore()
 
     while True:

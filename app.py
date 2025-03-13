@@ -92,16 +92,18 @@ def ouvrir_boutique():
             description = entry_description.get()
             price = float(entry_price.get())
             quantity = int(entry_quantity.get())
-            category_id = category_combobox.get()  # Nous utilisons la valeur sélectionnée dans le combobox
+            category_name = category_combobox.get()  # Récupérer le nom de la catégorie
+
+            # Trouver l'ID correspondant au nom de la catégorie sélectionnée
+            category_id = next((cat[1] for cat in categories if cat[0] == category_name), None)
 
             # Ajouter le produit
-            store.ajouter_produit(name, description, price, quantity, int(category_id))
-
-            # Afficher les produits après l'ajout
-            afficher_produits_boutique()
-
-            # Fermer la fenêtre du formulaire
-            ajout_fenetre.destroy()
+            if category_id:
+                store.ajouter_produit(name, description, price, quantity, category_id)
+                afficher_produits_boutique()  # Afficher les produits après l'ajout
+                ajout_fenetre.destroy()  # Fermer la fenêtre du formulaire
+            else:
+                print("Erreur : Catégorie non trouvée")
 
         # Créer une fenêtre pour saisir les informations du produit
         ajout_fenetre = Toplevel(window)

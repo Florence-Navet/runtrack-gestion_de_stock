@@ -17,7 +17,7 @@ class MangaStore:
             self.db = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",
+                password="123456",
                 database="mangastore"
             )
             self.cursor = self.db.cursor()
@@ -41,14 +41,14 @@ class MangaStore:
             self.cursor.execute("CREATE DATABASE IF NOT EXISTS mangastore")
             self.db.database = "mangastore"
 
-            self.cursor.execute("""
+            self.cursor.execute(""" 
                 CREATE TABLE IF NOT EXISTS category (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     name VARCHAR(100) NOT NULL
                 )
             """)
 
-            self.cursor.execute("""
+            self.cursor.execute(""" 
                 CREATE TABLE IF NOT EXISTS product (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
@@ -100,7 +100,7 @@ class MangaStore:
     def afficher_produits(self):
         """Affiche tous les produits du stock et retourne la liste."""
         print("\nExécution de la requête pour afficher les produits...")
-        self.cursor.execute("""
+        self.cursor.execute(""" 
             SELECT product.id, product.name, product.description, product.price, product.quantity, category.name
             FROM product
             JOIN category ON product.id_category = category.id
@@ -157,3 +157,13 @@ def menu():
 
 if __name__ == "__main__":
     menu()
+
+# --- Deuxième TODO List ---
+"""
+    TODO:
+    - Calcul du stock total : Calculer la valeur totale du stock en fonction des prix et des quantités.
+    - Affichage des produits les plus populaires : Trier les produits par leur quantité en stock.
+    - Gestion des commandes (optionnel) : Suivi des produits commandés par les clients.
+    - Gestion des utilisateurs (optionnel) : Système de gestion des utilisateurs (administrateurs, clients).
+    - Recherche par nom de produit : Permettre à l'utilisateur de rechercher un produit par son nom.
+"""

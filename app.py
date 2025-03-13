@@ -24,6 +24,10 @@ label_subtitle = Label(frame, text="MANGASTORE", font=("Courier", 40), bg='#ab7e
 # label_title.pack(side=LEFT)
 label_subtitle.pack()
 
+
+#ajouter un premier bouton
+yt_button = 
+
 #ajouter
 frame.pack(expand=YES)
 

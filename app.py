@@ -12,14 +12,6 @@ window.minsize(480, 360)
 window.iconbitmap("assets/logo.ico")
 window.config(background='#ab7e9c')
 
-# Création de l'image
-width = 300
-height = 300
-image = PhotoImage(file="assets/anime.png").zoom(35).subsample(32)
-canvas = Canvas(window, width=width, height=height, bg='#ab7e9c', bd=0, highlightthickness=0)
-canvas.create_image(width / 2, height / 2, image=image)
-canvas.pack(expand=YES)
-
 # Créer la frame principale
 frame_main = Frame(window, bg='#ab7e9c', bd='1', relief=SUNKEN)
 
@@ -31,18 +23,49 @@ label_title.pack()
 label_subtitle = Label(frame_main, text="MANGASTORE", font=("Courier", 35), bg='#ab7e9c', fg='#FFFFFF')
 label_subtitle.pack()
 
-# Fenêtre secondaire (affichage des produits et ajout de produits)
-frame_boutique = Frame(window, bg='#ab7e9c')
+# Ajouter une image à la fenêtre principale
+frame_image = Frame(frame_main, bg='#ab7e9c')
+frame_image.pack(pady=20)
+
+# Créer l'image
+image_width = 300
+image_height = 300
+image = PhotoImage(file="assets/anime.png").zoom(35).subsample(32)  # Charger l'image
+canvas = Canvas(frame_image, width=image_width, height=image_height, bg='#ab7e9c', bd=0, highlightthickness=0)
+canvas.create_image(image_width / 2, image_height / 2, image=image)
+canvas.image = image  # Important pour maintenir une référence à l'image
+canvas.pack()
 
 # Fonction pour afficher la boutique
 def ouvrir_boutique():
-    """Fonction pour afficher la boutique dans la même fenêtre."""
-    
-    # Cacher la fenêtre principale (frame)
-    frame_main.pack_forget()
-    
+    """Fonction pour afficher la boutique dans la même fenêtre.""" 
+    global frame_boutique
+    frame_boutique = Frame(window, bg='#ab7e9c')
+    frame_main.pack_forget()  # Cacher la fenêtre principale
+
     # Créer une instance de MangaStore
     store = MangaStore()
+
+    # Créer un frame pour l'image et les boutons dans la boutique
+    frame_image_button = Frame(frame_boutique, bg='#ab7e9c')
+    frame_image_button.pack(expand=YES, fill=BOTH)
+
+    # Créer un frame pour l'image
+    frame_image = Frame(frame_image_button, bg='#ab7e9c')
+    frame_image.pack(side=LEFT, padx=20)
+
+    # Créer l'image
+    width = 300
+    height = 300
+    image = PhotoImage(file="assets/anime.png").zoom(35).subsample(32)  # Charger l'image
+    canvas = Canvas(frame_image, width=width, height=height, bg='#ab7e9c', bd=0, highlightthickness=0)
+    canvas.create_image(width / 2, height / 2, image=image)
+    canvas.image = image  # Important pour maintenir une référence à l'image
+    canvas.pack()
+
+    # Créer un frame pour les boutons
+    frame_buttons = Frame(frame_image_button, bg='#ab7e9c')
+    frame_buttons.pack(side=RIGHT, padx=20, pady=20)
 
     # Fenêtre de produits
     frame_produits = Frame(frame_boutique, bg='#ab7e9c')
@@ -67,21 +90,19 @@ def ouvrir_boutique():
 
     # Fonction pour afficher les produits dans le Treeview
     def afficher_produits_boutique():
-        # Effacer les produits existants dans le Treeview avant d'ajouter les nouveaux
         for item in treeview.get_children():
             treeview.delete(item)
 
         # Récupérer et afficher les produits
-        produits = store.afficher_produits()  # On récupère les produits depuis la base de données
+        produits = store.afficher_produits()  
         if produits:
             for p in produits:
-                # Ajouter chaque produit dans le Treeview
                 treeview.insert("", "end", values=(p[0], p[1], p[2], f"{p[3]}€", p[4], p[5]))
         else:
             treeview.insert("", "end", values=("Aucun produit trouvé", "", "", "", "", ""))
 
     # Créer un bouton pour afficher les produits
-    bouton_afficher = Button(frame_boutique, text="Afficher les produits", command=afficher_produits_boutique, font=("Courier", 18))
+    bouton_afficher = Button(frame_buttons, text="Afficher les produits", command=afficher_produits_boutique, font=("Courier", 18))
     bouton_afficher.pack(pady=10)
 
     # Fonction pour ajouter un produit via un formulaire
@@ -155,7 +176,7 @@ def ouvrir_boutique():
         bouton_ajouter.pack(pady=20)
 
     # Ajouter un bouton pour ajouter un produit
-    bouton_ajouter_produit = Button(frame_boutique, text="Ajouter un produit", command=ajouter_produit_boutique, font=("Courier", 18))
+    bouton_ajouter_produit = Button(frame_buttons, text="Ajouter un produit", command=ajouter_produit_boutique, font=("Courier", 18))
     bouton_ajouter_produit.pack(pady=10)
 
     # Ajouter un bouton pour revenir à la fenêtre principale
@@ -163,7 +184,7 @@ def ouvrir_boutique():
         frame_boutique.pack_forget()  # Masquer la fenêtre boutique
         frame_main.pack(expand=YES)   # Afficher la fenêtre principale
         
-    bouton_retour = Button(frame_boutique, text="Retour", command=revenir_main_window, font=("Courier", 18))
+    bouton_retour = Button(frame_buttons, text="Retour", command=revenir_main_window, font=("Courier", 18))
     bouton_retour.pack(pady=10)
 
     # Afficher la boutique

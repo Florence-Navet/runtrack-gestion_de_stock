@@ -282,7 +282,7 @@ def ouvrir_boutique():
     # Ajouter un bouton pour modifier le produit dans la fenêtre des boutons
     def ajouter_bouton_modifier():
         bouton_modifier = Button(frame_buttons, text="Modifier produit", command=modifier_produit_window, font=("Courier", 12))
-        bouton_modifier.grid(row=3, column=2, padx=10, pady=10)  # Positionnez-le là où vous le souhaitez
+        bouton_modifier.grid(row=3, column=3, padx=10, pady=10)  # Positionnez-le là où vous le souhaitez
 
     # Appeler cette fonction pour ajouter le bouton "Modifier produit" au frame
     ajouter_bouton_modifier()

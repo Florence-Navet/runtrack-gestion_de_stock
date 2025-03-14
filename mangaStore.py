@@ -23,7 +23,7 @@ class MangaStore:
             self.db = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",
+                password="123456",  # Remplacez par le mot de passe correct si nécessaire
                 database="mangastore"
             )
             self.cursor = self.db.cursor()
@@ -41,7 +41,7 @@ class MangaStore:
             self.cursor.execute("CREATE DATABASE IF NOT EXISTS mangastore")
             self.db.database = "mangastore"
 
-            self.cursor.execute("""
+            self.cursor.execute(""" 
                 CREATE TABLE IF NOT EXISTS category (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     name VARCHAR(100) NOT NULL
@@ -70,6 +70,20 @@ class MangaStore:
         except mysql.connector.Error as err:
             print(f"Erreur lors de la création de la base de données ou des tables : {err}")
 
+    def filtrer_produits_par_categorie(self, category_name):
+        """Filtre les produits par catégorie."""
+        try:
+            self.cursor.execute("""
+                SELECT p.id, p.name, p.description, p.price, p.quantity, c.name
+                FROM product p 
+                LEFT JOIN category c ON p.id_category = c.id
+                WHERE c.name = %s
+            """, (category_name,))
+            return self.cursor.fetchall()
+        except mysql.connector.Error as err:
+            print(f"Erreur MySQL : {err}")
+            return []
+
     def ajouter_produit(self, name, description, price, quantity, category_id):
         """Ajoute un produit avec validation et debug."""
         try:
@@ -92,43 +106,33 @@ class MangaStore:
         """Supprime un produit de la base de données en fonction de son ID."""
         try:
             self.cursor.execute("SELECT * FROM product WHERE id = %s", (product_id,))
-            produit = self.cursor.fetchone()
-            
-            if not produit:
-                print(f"Erreur : Aucun produit trouvé avec l'ID {product_id}.")
+            if not self.cursor.fetchone():
+                print(f"Erreur : Produit avec ID {product_id} non trouvé.")
                 return
 
             self.cursor.execute("DELETE FROM product WHERE id = %s", (product_id,))
             self.db.commit()
-
-            print(f"Produit avec l'ID {product_id} supprimé avec succès !")
+            print(f"Produit avec ID {product_id} supprimé.")
         except mysql.connector.Error as err:
             print(f"Erreur MySQL : {err}")
 
     def afficher_produits(self):
-        """Affiche tous les produits du stock."""
-        self.cursor.execute("""
-            SELECT product.id, product.name, product.description, product.price, product.quantity, category.name
-            FROM product
-            JOIN category ON product.id_category = category.id
-            ORDER BY product.id ASC
-        """)
-        produits = self.cursor.fetchall()
-
-        if not produits:
-            print("\nAucun produit trouvé dans la base de données.")
+        """Affiche tous les produits dans la base de données."""
+        try:
+            self.cursor.execute("""SELECT p.id, p.name, p.description, p.price, p.quantity, c.name
+                                   FROM product p 
+                                   LEFT JOIN category c ON p.id_category = c.id""")
+            return self.cursor.fetchall()
+        except mysql.connector.Error as err:
+            print(f"Erreur MySQL : {err}")
             return []
-
-        for p in produits:
-            print(f"ID: {p[0]}, Nom: {p[1]}, Description: {p[2]}, Prix: {p[3]}€, Stock: {p[4]}, Catégorie: {p[5]}")
-        return produits
 
     def fermer_connexion(self):
         """Ferme la connexion à la base de données."""
         self.cursor.close()
         self.db.close()
         print("Connexion MySQL fermée.")
-
+        
 # --- Interface CLI ---
 def menu():
     store = MangaStore()
@@ -136,12 +140,17 @@ def menu():
         print("\n MENU PRINCIPAL")
         print("1. Afficher les produits")
         print("2. Ajouter un produit")
-        print("3. Quitter")
+        print("3. Supprimer un produit")
+        print("4. Filtrer les produits par catégorie")
+        print("5. Quitter")
         choix = input("Choisissez une option : ")
 
         match choix:
             case "1":
-                store.afficher_produits()
+                produits = store.afficher_produits()
+                if produits:
+                    for p in produits:
+                        print(f"ID: {p[0]}, Nom: {p[1]}, Description: {p[2]}, Prix: {p[3]}€, Stock: {p[4]}, Catégorie: {p[5]}")
             case "2":
                 name = input("Nom du produit : ")
                 description = input("Description : ")
@@ -150,6 +159,17 @@ def menu():
                 category_id = int(input("ID de la catégorie : "))
                 store.ajouter_produit(name, description, price, quantity, category_id)
             case "3":
+                product_id = int(input("Entrez l'ID du produit à supprimer : "))
+                store.supprimer_produit(product_id)
+            case "4":
+                category_name = input("Nom de la catégorie à filtrer : ")
+                produits = store.filtrer_produits_par_categorie(category_name)
+                if produits:
+                    for p in produits:
+                        print(f"ID: {p[0]}, Nom: {p[1]}, Description: {p[2]}, Prix: {p[3]}€, Stock: {p[4]}, Catégorie: {p[5]}")
+                else:
+                    print(f"Aucun produit trouvé dans la catégorie '{category_name}'.")
+            case "5":
                 store.fermer_connexion()
                 break
             case _:

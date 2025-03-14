@@ -1,6 +1,5 @@
 from tkinter import *
-import tkinter.ttk as ttk  
-from tkinter import messagebox  # Importer messagebox pour la confirmation de suppression
+import tkinter.ttk as ttk  # Importer ttk pour utiliser Combobox
 from mangaStore import MangaStore
 
 # Fenêtre principale
@@ -90,117 +89,122 @@ def ouvrir_boutique():
     treeview.column('Catégorie', width=150)  # Colonne Catégorie plus petite
 
     # Fonction pour afficher les produits dans le Treeview
-    def afficher_produits_boutique():
+    def afficher_produits_boutique(categorie=None):
         for item in treeview.get_children():
             treeview.delete(item)
 
-        # Récupérer et afficher les produits
-        produits = store.afficher_produits()  
+        # Récupérer et afficher les produits filtrés par catégorie si nécessaire
+        produits = store.filtrer_produits_par_categorie(categorie) if categorie else store.afficher_produits()
         if produits:
             for p in produits:
                 treeview.insert("", "end", values=(p[0], p[1], p[2], f"{p[3]}€", p[4], p[5]))
         else:
             treeview.insert("", "end", values=("Aucun produit trouvé", "", "", "", "", ""))
 
-    # Créer un bouton pour afficher les produits
-    bouton_afficher = Button(frame_buttons, text="Afficher les produits", command=afficher_produits_boutique, font=("Courier", 18))
-    bouton_afficher.pack(pady=10)
+    # Combobox pour filtrer par catégorie
+    def appliquer_filtre():
+        category_name = category_combobox.get()
+        afficher_produits_boutique(category_name)
 
-    # Fonction pour ajouter un produit via un formulaire
-    def ajouter_produit_boutique():
-        def ajouter():
-            # Récupérer les valeurs des champs de saisie
+    # Liste des catégories disponibles
+    categories = [
+        ("Manga Shonen", 1),
+        ("Manga Shojo", 2),
+        ("Manga Seinen", 3),
+        ("Goodies", 4),
+        ("Figurines", 5)
+    ]
+    category_names = [cat[0] for cat in categories]
+
+    # Créer un Combobox pour la sélection de la catégorie
+    label_category = Label(frame_buttons, text="Filtrer par catégorie:", font=("Consolas", 20), bg='#ab7e9c')
+    label_category.pack(pady=10)
+
+    category_combobox = ttk.Combobox(frame_buttons, values=category_names, font=("Consolas", 20))
+    category_combobox.pack(pady=10)
+    category_combobox.set("Sélectionner une catégorie")  # Valeur par défaut
+
+    # Bouton pour appliquer le filtre
+    bouton_filtrer = Button(frame_buttons, text="Appliquer le filtre", command=appliquer_filtre, font=("Courier", 18))
+    bouton_filtrer.pack(pady=10)
+
+    # Créer un bouton pour afficher tous les produits
+    bouton_afficher_tous = Button(frame_buttons, text="Afficher tous les produits", command=lambda: afficher_produits_boutique(), font=("Courier", 18))
+    bouton_afficher_tous.pack(pady=10)
+
+    # Ajout d'un produit
+    def ajouter_produit_window():
+        """Fonction pour ajouter un produit"""
+        add_window = Toplevel(window)
+        add_window.title("Ajouter un produit")
+        add_window.geometry("400x400")
+
+        # Champs pour les informations du produit
+        label_name = Label(add_window, text="Nom du produit:", font=("Consolas", 14))
+        label_name.pack(pady=5)
+        entry_name = Entry(add_window, font=("Consolas", 14))
+        entry_name.pack(pady=5)
+
+        label_desc = Label(add_window, text="Description du produit:", font=("Consolas", 14))
+        label_desc.pack(pady=5)
+        entry_desc = Entry(add_window, font=("Consolas", 14))
+        entry_desc.pack(pady=5)
+
+        label_price = Label(add_window, text="Prix du produit:", font=("Consolas", 14))
+        label_price.pack(pady=5)
+        entry_price = Entry(add_window, font=("Consolas", 14))
+        entry_price.pack(pady=5)
+
+        label_quantity = Label(add_window, text="Quantité du produit:", font=("Consolas", 14))
+        label_quantity.pack(pady=5)
+        entry_quantity = Entry(add_window, font=("Consolas", 14))
+        entry_quantity.pack(pady=5)
+
+        label_category = Label(add_window, text="Catégorie du produit:", font=("Consolas", 14))
+        label_category.pack(pady=5)
+
+        category_combobox_add = ttk.Combobox(add_window, values=category_names, font=("Consolas", 14))
+        category_combobox_add.pack(pady=5)
+
+        def submit_produit():
+            # Récupérer les informations et ajouter le produit à la base de données
             name = entry_name.get()
-            description = entry_description.get()
-            price = float(entry_price.get())
-            quantity = int(entry_quantity.get())
-            category_name = category_combobox.get()  # Récupérer le nom de la catégorie
-
-            # Trouver l'ID correspondant au nom de la catégorie sélectionnée
+            description = entry_desc.get()
+            price = entry_price.get()
+            quantity = entry_quantity.get()
+            category_name = category_combobox_add.get()
             category_id = next((cat[1] for cat in categories if cat[0] == category_name), None)
+            store.ajouter_produit(name, description, price, quantity, category_id)
+            add_window.destroy()  # Fermer la fenêtre d'ajout
 
-            # Ajouter le produit
-            if category_id:
-                store.ajouter_produit(name, description, price, quantity, category_id)
-                afficher_produits_boutique()  # Afficher les produits après l'ajout
-                ajout_fenetre.destroy()  # Fermer la fenêtre du formulaire
-            else:
-                print("Erreur : Catégorie non trouvée")
+        bouton_add = Button(add_window, text="Ajouter", command=submit_produit, font=("Consolas", 14))
+        bouton_add.pack(pady=20)
 
-        # Créer une fenêtre pour saisir les informations du produit
-        ajout_fenetre = Toplevel(window)
-        ajout_fenetre.title("Ajouter un produit")
-        ajout_fenetre.geometry("1080x720")
+    bouton_ajouter = Button(frame_buttons, text="Ajouter un produit", command=ajouter_produit_window, font=("Courier", 18))
+    bouton_ajouter.pack(pady=10)
 
-        # Créer les champs de saisie
-        label_name = Label(ajout_fenetre, text="Nom du produit:", font=("Consolas", 20))
-        label_name.pack(pady=10)
-        entry_name = Entry(ajout_fenetre, font=("Consolas", 20))
-        entry_name.pack(pady=10)
+    # Suppression d'un produit
+    def supprimer_produit_window():
+        """Fonction pour supprimer un produit"""
+        delete_window = Toplevel(window)
+        delete_window.title("Supprimer un produit")
+        delete_window.geometry("400x400")
 
-        label_description = Label(ajout_fenetre, text="Description du produit:", font=("Consolas", 20))
-        label_description.pack(pady=10)
-        entry_description = Entry(ajout_fenetre, font=("Consolas", 20))
-        entry_description.pack(pady=10)
+        label_product_id = Label(delete_window, text="ID du produit à supprimer:", font=("Consolas", 14))
+        label_product_id.pack(pady=5)
+        entry_product_id = Entry(delete_window, font=("Consolas", 14))
+        entry_product_id.pack(pady=5)
 
-        label_price = Label(ajout_fenetre, text="Prix:", font=("Consolas", 20))
-        label_price.pack(pady=10)
-        entry_price = Entry(ajout_fenetre, font=("Consolas", 20))
-        entry_price.pack(pady=10)
-
-        label_quantity = Label(ajout_fenetre, text="Quantité:", font=("Consolas", 20))
-        label_quantity.pack(pady=10)
-        entry_quantity = Entry(ajout_fenetre, font=("Consolas", 20))
-        entry_quantity.pack(pady=10)
-
-        # Créer le combobox pour la sélection de la catégorie
-        label_category = Label(ajout_fenetre, text="Sélectionner la catégorie:", font=("Consolas", 20))
-        label_category.pack(pady=10)
-
-        # Liste des catégories avec leurs ID
-        categories = [
-            ("Manga Shonen", 1),
-            ("Manga Shojo", 2),
-            ("Manga Seinen", 3),
-            ("Goodies", 4),
-            ("Figurines", 5)
-        ]
-        category_names = [cat[0] for cat in categories]
-
-        # Créer un Combobox pour la sélection de la catégorie
-        category_combobox = ttk.Combobox(ajout_fenetre, values=category_names, font=("Consolas", 20))
-        category_combobox.pack(pady=10)
-        category_combobox.set("Sélectionner une catégorie")  # Valeur par défaut
-
-        # Bouton pour ajouter le produit
-        bouton_ajouter = Button(ajout_fenetre, text="Ajouter", command=ajouter, font=("Consolas", 20))
-        bouton_ajouter.pack(pady=20)
-
-    # Ajouter un bouton pour ajouter un produit
-    bouton_ajouter_produit = Button(frame_buttons, text="Ajouter un produit", command=ajouter_produit_boutique, font=("Courier", 18))
-    bouton_ajouter_produit.pack(pady=10)
-
-# Fonction pour supprimer un produit de la boutique
-    def supprimer_produit_boutique():
-        """Fonction pour supprimer un produit de la boutique via l'ID sélectionné."""
-        selected_item = treeview.selection()
-        if not selected_item:
-            messagebox.showerror("Erreur", "Aucun produit sélectionné. Veuillez sélectionner un produit pour le supprimer.")
-            return
-
-        # Récupérer l'ID du produit sélectionné
-        product_id = treeview.item(selected_item, 'values')[0]  # ID est dans la première colonne
-
-        # Confirmer la suppression
-        confirmation = messagebox.askyesno("Confirmation", f"Êtes-vous sûr de vouloir supprimer le produit avec l'ID {product_id} ?")
-        
-        if confirmation:
+        def submit_delete():
+            product_id = entry_product_id.get()
             store.supprimer_produit(product_id)
-            afficher_produits_boutique()  # Mettre à jour l'affichage après suppression
+            delete_window.destroy()  # Fermer la fenêtre de suppression
 
-        # Ajouter un bouton pour supprimer un produit
-    bouton_supprimer_produit = Button(frame_buttons, text="Supprimer un produit", command=supprimer_produit_boutique, font=("Courier", 18))
-    bouton_supprimer_produit.pack(pady=10)
+        bouton_delete = Button(delete_window, text="Supprimer", command=submit_delete, font=("Consolas", 14))
+        bouton_delete.pack(pady=20)
+
+    bouton_supprimer = Button(frame_buttons, text="Supprimer un produit", command=supprimer_produit_window, font=("Courier", 18))
+    bouton_supprimer.pack(pady=10)
 
     # Ajouter un bouton pour revenir à la fenêtre principale
     def revenir_main_window():

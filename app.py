@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter.ttk as ttk  
+from tkinter import messagebox  # Importer messagebox pour la confirmation de suppression
 from mangaStore import MangaStore
 
 # Fenêtre principale
@@ -178,11 +179,26 @@ def ouvrir_boutique():
     # Ajouter un bouton pour ajouter un produit
     bouton_ajouter_produit = Button(frame_buttons, text="Ajouter un produit", command=ajouter_produit_boutique, font=("Courier", 18))
     bouton_ajouter_produit.pack(pady=10)
-    
-    def supprimer_produit_boutique():
-        pass
 
-    # Ajouter un bouton pour supprimer un produit
+# Fonction pour supprimer un produit de la boutique
+    def supprimer_produit_boutique():
+        """Fonction pour supprimer un produit de la boutique via l'ID sélectionné."""
+        selected_item = treeview.selection()
+        if not selected_item:
+            messagebox.showerror("Erreur", "Aucun produit sélectionné. Veuillez sélectionner un produit pour le supprimer.")
+            return
+
+        # Récupérer l'ID du produit sélectionné
+        product_id = treeview.item(selected_item, 'values')[0]  # ID est dans la première colonne
+
+        # Confirmer la suppression
+        confirmation = messagebox.askyesno("Confirmation", f"Êtes-vous sûr de vouloir supprimer le produit avec l'ID {product_id} ?")
+        
+        if confirmation:
+            store.supprimer_produit(product_id)
+            afficher_produits_boutique()  # Mettre à jour l'affichage après suppression
+
+        # Ajouter un bouton pour supprimer un produit
     bouton_supprimer_produit = Button(frame_buttons, text="Supprimer un produit", command=supprimer_produit_boutique, font=("Courier", 18))
     bouton_supprimer_produit.pack(pady=10)
 

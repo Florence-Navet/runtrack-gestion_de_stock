@@ -1,5 +1,5 @@
 from tkinter import *
-import tkinter.ttk as ttk  # Importer ttk pour utiliser Combobox
+import tkinter.ttk as ttk  
 from mangaStore import MangaStore
 
 # Fenêtre principale

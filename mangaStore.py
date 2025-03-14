@@ -99,6 +99,7 @@ class MangaStore:
             SELECT product.id, product.name, product.description, product.price, product.quantity, category.name
             FROM product
             JOIN category ON product.id_category = category.id
+            ORDER BY product.id ASC
         """)
         produits = self.cursor.fetchall()
 

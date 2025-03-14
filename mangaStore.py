@@ -1,20 +1,9 @@
 import mysql.connector
+import csv
 
 class MangaStore:
     """
     Classe pour gérer un magasin de mangas avec une base de données MySQL.
-    ============================================
-    TODO:
-    - Modification d'un produit : Sélectionnez un produit et modifiez ses informations via un formulaire.
-
-    - Exportation en CSV : Cliquez sur un bouton pour exporter les produits en format CSV.
-    **********************************************************************
-    TODO:
-    - Calcul du stock total : Calculer la valeur totale du stock en fonction des prix et des quantités.
-    - Affichage des produits les plus populaires : Trier les produits par leur quantité en stock.
-    - Gestion des commandes (optionnel) : Suivi des produits commandés par les clients.
-    - Gestion des utilisateurs (optionnel) : Système de gestion des utilisateurs (administrateurs, clients).
-    - Recherche par nom de produit : Permettre à l'utilisateur de rechercher un produit par son nom.
     """
 
     def __init__(self):
@@ -132,7 +121,55 @@ class MangaStore:
         self.cursor.close()
         self.db.close()
         print("Connexion MySQL fermée.")
-        
+
+    def modifier_produit(self, product_id, name, description, price, quantity, category_id):
+        """Modifie un produit existant dans la base de données."""
+        try:
+            # Vérifier si le produit existe
+            self.cursor.execute("SELECT * FROM product WHERE id = %s", (product_id,))
+            if not self.cursor.fetchone():
+                print(f"Erreur : Produit avec ID {product_id} non trouvé.")
+                return
+
+            # Mettre à jour les informations du produit
+            query = """UPDATE product
+                       SET name = %s, description = %s, price = %s, quantity = %s, id_category = %s
+                       WHERE id = %s"""
+            values = (name, description, price, quantity, category_id, product_id)
+            self.cursor.execute(query, values)
+            self.db.commit()
+
+            print(f"Produit avec ID {product_id} modifié avec succès !")
+        except mysql.connector.Error as err:
+            print(f"Erreur MySQL : {err}")
+
+    def exporter_en_csv(self):
+        """Exporte les produits en fichier CSV."""
+        try:
+            produits = self.afficher_produits()
+            if produits:
+                with open('produits.csv', 'w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(["ID", "Nom", "Description", "Prix (€)", "Stock", "Catégorie"])
+                    for p in produits:
+                        writer.writerow([p[0], p[1], p[2], p[3], p[4], p[5]])
+                print("Les produits ont été exportés avec succès dans 'produits.csv'.")
+            else:
+                print("Aucun produit à exporter.")
+        except Exception as e:
+            print(f"Erreur lors de l'exportation : {e}")
+
+    def calculer_stock_total(self):
+        """Calculer la valeur totale du stock."""
+        try:
+            self.cursor.execute("SELECT price, quantity FROM product")
+            produits = self.cursor.fetchall()
+            total = sum(p[0] * p[1] for p in produits)
+            print(f"Valeur totale du stock : {total}€")
+        except mysql.connector.Error as err:
+            print(f"Erreur MySQL : {err}")
+
+
 # --- Interface CLI ---
 def menu():
     store = MangaStore()
@@ -142,7 +179,10 @@ def menu():
         print("2. Ajouter un produit")
         print("3. Supprimer un produit")
         print("4. Filtrer les produits par catégorie")
-        print("5. Quitter")
+        print("5. Modifier un produit")
+        print("6. Exporter en CSV")
+        print("7. Calculer le stock total")
+        print("8. Quitter")
         choix = input("Choisissez une option : ")
 
         match choix:
@@ -170,6 +210,18 @@ def menu():
                 else:
                     print(f"Aucun produit trouvé dans la catégorie '{category_name}'.")
             case "5":
+                product_id = int(input("Entrez l'ID du produit à modifier : "))
+                name = input("Nouveau nom du produit : ")
+                description = input("Nouvelle description : ")
+                price = float(input("Nouveau prix (€) : "))
+                quantity = int(input("Nouveau stock : "))
+                category_id = int(input("Nouvel ID de la catégorie : "))
+                store.modifier_produit(product_id, name, description, price, quantity, category_id)
+            case "6":
+                store.exporter_en_csv()
+            case "7":
+                store.calculer_stock_total()
+            case "8":
                 store.fermer_connexion()
                 break
             case _:

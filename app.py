@@ -38,7 +38,7 @@ canvas.pack()
 
 # Fonction pour afficher la boutique
 def ouvrir_boutique():
-    """Fonction pour afficher la boutique dans la même fenêtre.""" 
+    """Fonction pour afficher la boutique dans la même fenêtre."""
     global frame_boutique
     frame_boutique = Frame(window, bg='#ab7e9c')
     frame_main.pack_forget()  # Cacher la fenêtre principale
@@ -123,21 +123,14 @@ def ouvrir_boutique():
     category_combobox = ttk.Combobox(frame_buttons, values=category_names, font=("Consolas", 12))
     category_combobox.grid(row=0, column=1, padx=10, pady=10, columnspan=2, sticky='n')
     category_combobox.set("catégorie")
-    
 
-  
     # Bouton pour appliquer le filtre
     bouton_filtrer = Button(frame_buttons, text="Appliquer Filtre", command=appliquer_filtre, font=("Courier", 12))
     bouton_filtrer.grid(row=1, column=0, padx=10, pady=10, columnspan=2, sticky='n')
 
-    
-  
     # Créer un bouton pour afficher tous les produits
     bouton_afficher_tous = Button(frame_buttons, text="Afficher produits", command=lambda: afficher_produits_boutique(), font=("Courier", 12))
-    # Positionner le bouton en haut à gauche dans la fenêtre (row=0, column=0)
     bouton_afficher_tous.grid(row=0, column=0, padx=10, pady=10, sticky='nw')
-
-
 
     # Ajout d'un produit
     def ajouter_produit_window():
@@ -212,6 +205,87 @@ def ouvrir_boutique():
 
     bouton_supprimer = Button(frame_buttons, text="Supprimer produit", command=supprimer_produit_window, font=("Courier", 12))
     bouton_supprimer.grid(row=2, column=1, padx=10, pady=10)
+
+    # Fenêtre pour modifier un produit
+    def modifier_produit_window():
+        """Fonction pour modifier un produit"""
+        modify_window = Toplevel(window)
+        modify_window.title("Modifier un produit")
+        modify_window.geometry("500x500")
+
+        # Sélectionner la catégorie actuelle
+        label_current_category = Label(modify_window, text="Sélectionner la catégorie actuelle:", font=("Consolas", 14))
+        label_current_category.pack(pady=5)
+        
+        category_combobox_current = ttk.Combobox(modify_window, values=category_names, font=("Consolas", 14))
+        category_combobox_current.pack(pady=5)
+
+        # Sélectionner le produit à modifier dans la catégorie
+        label_current_product = Label(modify_window, text="Sélectionner le produit à modifier:", font=("Consolas", 14))
+        label_current_product.pack(pady=5)
+
+        product_combobox = ttk.Combobox(modify_window, font=("Consolas", 14))
+        product_combobox.pack(pady=5)
+
+        # Ajouter un bouton pour modifier un produit
+        bouton_modifier = Button(frame_buttons, text="Modifier produit", command=modifier_produit_window, font=("Courier", 12))
+        bouton_modifier.grid(row=3, column=2, padx=10, pady=10)  # Changer l'emplacement selon les besoins
+
+
+
+        # Fonction pour mettre à jour la liste des produits selon la catégorie choisie
+        def update_product_list(event=None):
+            # Récupérer la catégorie actuelle
+            selected_category = category_combobox_current.get()
+            # Filtrer les produits selon la catégorie choisie
+            filtered_products = store.filtrer_produits_par_categorie(selected_category)
+            # Mettre à jour les produits dans le combobox
+            product_combobox['values'] = [p[1] for p in filtered_products]  # Affiche les noms des produits
+            product_combobox.set('')  # Réinitialiser la sélection du produit
+
+        # Lier la mise à jour de la liste des produits à la sélection de la catégorie
+        category_combobox_current.bind("<<ComboboxSelected>>", update_product_list)
+
+        # Sélectionner la nouvelle catégorie
+        label_new_category = Label(modify_window, text="Sélectionner la nouvelle catégorie:", font=("Consolas", 14))
+        label_new_category.pack(pady=5)
+
+        category_combobox_new = ttk.Combobox(modify_window, values=category_names, font=("Consolas", 14))
+        category_combobox_new.pack(pady=5)
+
+        # Fonction pour appliquer les modifications
+        def submit_modification():
+            current_category = category_combobox_current.get()
+            current_product_name = product_combobox.get()
+            new_category_name = category_combobox_new.get()
+            
+            # Trouver les IDs des catégories et produits
+            current_category_id = next((cat[1] for cat in categories if cat[0] == current_category), None)
+            new_category_id = next((cat[1] for cat in categories if cat[0] == new_category_name), None)
+            
+            # Trouver le produit à partir de son nom dans la catégorie sélectionnée
+            current_product = next((p for p in store.filtrer_produits_par_categorie(current_category) if p[1] == current_product_name), None)
+            if current_product:
+                product_id = current_product[0]
+                
+                # Modifier le produit
+                store.modifier_produit(product_id, current_product_name, current_product[2], current_product[3], current_product[4], new_category_id)
+                modify_window.destroy()  # Fermer la fenêtre après modification
+            else:
+                print("Produit introuvable")
+
+        # Ajouter un bouton pour valider la modification
+        bouton_validate = Button(modify_window, text="Valider", command=submit_modification, font=("Consolas", 14))
+        bouton_validate.pack(pady=20)
+
+
+    # Ajouter un bouton pour modifier le produit dans la fenêtre des boutons
+    def ajouter_bouton_modifier():
+        bouton_modifier = Button(frame_buttons, text="Modifier produit", command=modifier_produit_window, font=("Courier", 12))
+        bouton_modifier.grid(row=3, column=2, padx=10, pady=10)  # Positionnez-le là où vous le souhaitez
+
+    # Appeler cette fonction pour ajouter le bouton "Modifier produit" au frame
+    ajouter_bouton_modifier()
 
     # Ajouter un bouton pour revenir à la fenêtre principale
     def revenir_main_window():

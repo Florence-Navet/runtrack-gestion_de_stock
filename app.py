@@ -16,7 +16,7 @@ window.config(background='#ab7e9c')
 frame_main = Frame(window, bg='#ab7e9c', bd='1', relief=SUNKEN)
 
 # Ajouter un premier titre
-label_title = Label(frame_main, text="Bienvenue dans ma boutique", font=("Courier", 25), bg='#ab7e9c', fg='#FFFFFF')
+label_title = Label(frame_main, text="Gestion de ma boutique", font=("Courier", 25), bg='#ab7e9c', fg='#FFFFFF')
 label_title.pack()
 
 # Ajouter un sous-titre
@@ -178,6 +178,13 @@ def ouvrir_boutique():
     # Ajouter un bouton pour ajouter un produit
     bouton_ajouter_produit = Button(frame_buttons, text="Ajouter un produit", command=ajouter_produit_boutique, font=("Courier", 18))
     bouton_ajouter_produit.pack(pady=10)
+    
+    def supprimer_produit_boutique():
+        pass
+
+    # Ajouter un bouton pour supprimer un produit
+    bouton_supprimer_produit = Button(frame_buttons, text="Supprimer un produit", command=supprimer_produit_boutique, font=("Courier", 18))
+    bouton_supprimer_produit.pack(pady=10)
 
     # Ajouter un bouton pour revenir à la fenêtre principale
     def revenir_main_window():

@@ -6,7 +6,7 @@ class MangaStore:
     ============================================
     TODO:
     - Modification d'un produit : Sélectionnez un produit et modifiez ses informations via un formulaire.
-    - Filtrage par catégorie : Sélectionnez une catégorie pour afficher uniquement les produits de cette catégorie.
+
     - Exportation en CSV : Cliquez sur un bouton pour exporter les produits en format CSV.
     **********************************************************************
     TODO:

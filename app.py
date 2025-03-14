@@ -50,19 +50,6 @@ def ouvrir_boutique():
     frame_image_button = Frame(frame_boutique, bg='#ab7e9c')
     frame_image_button.pack(expand=YES, fill=BOTH)
 
-    # Créer un frame pour l'image
-    frame_image = Frame(frame_image_button, bg='#ab7e9c')
-    frame_image.pack(side=LEFT, padx=20)
-
-    # Créer l'image
-    width = 300
-    height = 300
-    image = PhotoImage(file="assets/anime.png").zoom(35).subsample(32)  # Charger l'image
-    canvas = Canvas(frame_image, width=width, height=height, bg='#ab7e9c', bd=0, highlightthickness=0)
-    canvas.create_image(width / 2, height / 2, image=image)
-    canvas.image = image  # Important pour maintenir une référence à l'image
-    canvas.pack()
-
     # Créer un frame pour les boutons
     frame_buttons = Frame(frame_image_button, bg='#ab7e9c')
     frame_buttons.pack(side=RIGHT, padx=20, pady=20)
@@ -87,6 +74,15 @@ def ouvrir_boutique():
     treeview.column('Prix', width=100)       # Colonne Prix plus petite
     treeview.column('Stock', width=100)      # Colonne Stock plus petite
     treeview.column('Catégorie', width=150)  # Colonne Catégorie plus petite
+
+    # Augmenter la hauteur des lignes (en ajustant la police et le padding)
+    style = ttk.Style()
+    style.configure("Treeview",
+                    font=("Arial", 12),  # Augmenter la taille de la police pour des cellules plus hautes
+                    rowheight=30)  # Ajuster la hauteur des lignes (en pixels)
+
+    # Appliquer le style au Treeview
+    treeview.configure(style="Treeview")
 
     # Fonction pour afficher les produits dans le Treeview
     def afficher_produits_boutique(categorie=None):
@@ -116,21 +112,32 @@ def ouvrir_boutique():
     ]
     category_names = [cat[0] for cat in categories]
 
+    # Frame contenant les boutons et la catégorie
+    frame_buttons = Frame(frame_image_button, bg='#ab7e9c')
+    frame_buttons.pack(side=TOP, pady=30)
+
     # Créer un Combobox pour la sélection de la catégorie
-    label_category = Label(frame_buttons, text="Filtrer par catégorie:", font=("Consolas", 20), bg='#ab7e9c')
-    label_category.pack(pady=10)
+    label_category = Label(frame_buttons, text="", font=("Consolas", 20), bg='#ab7e9c')
+    label_category.grid(row=0, column=0, padx=10, pady=10, columnspan=2, sticky='n')
 
-    category_combobox = ttk.Combobox(frame_buttons, values=category_names, font=("Consolas", 20))
-    category_combobox.pack(pady=10)
-    category_combobox.set("Sélectionner une catégorie")  # Valeur par défaut
+    category_combobox = ttk.Combobox(frame_buttons, values=category_names, font=("Consolas", 12))
+    category_combobox.grid(row=0, column=1, padx=10, pady=10, columnspan=2, sticky='n')
+    category_combobox.set("catégorie")
+    
 
+  
     # Bouton pour appliquer le filtre
-    bouton_filtrer = Button(frame_buttons, text="Appliquer le filtre", command=appliquer_filtre, font=("Courier", 18))
-    bouton_filtrer.pack(pady=10)
+    bouton_filtrer = Button(frame_buttons, text="Appliquer Filtre", command=appliquer_filtre, font=("Courier", 12))
+    bouton_filtrer.grid(row=1, column=0, padx=10, pady=10, columnspan=2, sticky='n')
 
+    
+  
     # Créer un bouton pour afficher tous les produits
-    bouton_afficher_tous = Button(frame_buttons, text="Afficher tous les produits", command=lambda: afficher_produits_boutique(), font=("Courier", 18))
-    bouton_afficher_tous.pack(pady=10)
+    bouton_afficher_tous = Button(frame_buttons, text="Afficher produits", command=lambda: afficher_produits_boutique(), font=("Courier", 12))
+    # Positionner le bouton en haut à gauche dans la fenêtre (row=0, column=0)
+    bouton_afficher_tous.grid(row=0, column=0, padx=10, pady=10, sticky='nw')
+
+
 
     # Ajout d'un produit
     def ajouter_produit_window():
@@ -180,8 +187,8 @@ def ouvrir_boutique():
         bouton_add = Button(add_window, text="Ajouter", command=submit_produit, font=("Consolas", 14))
         bouton_add.pack(pady=20)
 
-    bouton_ajouter = Button(frame_buttons, text="Ajouter un produit", command=ajouter_produit_window, font=("Courier", 18))
-    bouton_ajouter.pack(pady=10)
+    bouton_ajouter = Button(frame_buttons, text="Ajouter produit", command=ajouter_produit_window, font=("Courier", 12))
+    bouton_ajouter.grid(row=2, column=0, padx=10, pady=10)
 
     # Suppression d'un produit
     def supprimer_produit_window():
@@ -203,8 +210,8 @@ def ouvrir_boutique():
         bouton_delete = Button(delete_window, text="Supprimer", command=submit_delete, font=("Consolas", 14))
         bouton_delete.pack(pady=20)
 
-    bouton_supprimer = Button(frame_buttons, text="Supprimer un produit", command=supprimer_produit_window, font=("Courier", 18))
-    bouton_supprimer.pack(pady=10)
+    bouton_supprimer = Button(frame_buttons, text="Supprimer produit", command=supprimer_produit_window, font=("Courier", 12))
+    bouton_supprimer.grid(row=2, column=1, padx=10, pady=10)
 
     # Ajouter un bouton pour revenir à la fenêtre principale
     def revenir_main_window():
@@ -212,7 +219,7 @@ def ouvrir_boutique():
         frame_main.pack(expand=YES)   # Afficher la fenêtre principale
         
     bouton_retour = Button(frame_buttons, text="Retour", command=revenir_main_window, font=("Courier", 18))
-    bouton_retour.pack(pady=10)
+    bouton_retour.grid(row=3, column=0, columnspan=2, pady=10)
 
     # Afficher la boutique
     frame_boutique.pack(expand=YES, fill=BOTH)

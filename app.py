@@ -1,6 +1,9 @@
 from tkinter import *
 import tkinter.ttk as ttk  # Importer ttk pour utiliser Combobox
 from mangaStore import MangaStore
+import csv
+from tkinter import filedialog
+
 
 # Fenêtre principale
 window = Tk()
@@ -112,9 +115,9 @@ def ouvrir_boutique():
     ]
     category_names = [cat[0] for cat in categories]
 
-    # Frame contenant les boutons et la catégorie
+    # Créer un frame pour les boutons
     frame_buttons = Frame(frame_image_button, bg='#ab7e9c')
-    frame_buttons.pack(side=TOP, pady=30)
+    frame_buttons.pack(side=TOP, pady=30)  # Une seule déclaration de frame_buttons
 
     # Créer un Combobox pour la sélection de la catégorie
     label_category = Label(frame_buttons, text="", font=("Consolas", 20), bg='#ab7e9c')
@@ -131,6 +134,32 @@ def ouvrir_boutique():
     # Créer un bouton pour afficher tous les produits
     bouton_afficher_tous = Button(frame_buttons, text="Afficher produits", command=lambda: afficher_produits_boutique(), font=("Courier", 12))
     bouton_afficher_tous.grid(row=0, column=0, padx=10, pady=10, sticky='nw')
+
+    def exporter_csv():
+            # Créer une instance de MangaStore
+            store = MangaStore()
+
+            # Récupérer tous les produits de la boutique
+            produits = store.afficher_produits()
+            
+            # Ouvrir une boîte de dialogue pour sélectionner où sauvegarder le fichier CSV
+            file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
+            
+            if file_path:
+                # Créer le fichier CSV
+                with open(file_path, mode='w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    # Écrire les en-têtes du CSV
+                    writer.writerow(['ID', 'Nom', 'Description', 'Prix', 'Stock', 'Catégorie'])
+                    # Ajouter les produits au fichier CSV
+                    for produit in produits:
+                        writer.writerow([produit[0], produit[1], produit[2], f"{produit[3]}€", produit[4], produit[5]])
+
+                print(f"Les produits ont été exportés vers {file_path}")
+            else:
+                print("Exportation annulée.")
+    bouton_export_csv = Button(frame_buttons, text="Exporter CSV", command=exporter_csv, font=("Courier", 12))
+    bouton_export_csv.grid(row=2, column=4, padx=10, pady=10, columnspan=2, sticky='n')
 
     # Ajout d'un produit
     def ajouter_produit_window():
@@ -227,9 +256,9 @@ def ouvrir_boutique():
         product_combobox = ttk.Combobox(modify_window, font=("Consolas", 14))
         product_combobox.pack(pady=5)
 
-        # Ajouter un bouton pour modifier un produit
-        bouton_modifier = Button(frame_buttons, text="Modifier produit", command=modifier_produit_window, font=("Courier", 12))
-        bouton_modifier.grid(row=3, column=2, padx=10, pady=10)  # Changer l'emplacement selon les besoins
+        # # Ajouter un bouton pour modifier un produit
+        # bouton_modifier = Button(frame_buttons, text="Modifier produit", command=modifier_produit_window, font=("Courier", 12))
+        # bouton_modifier.grid(row=3, column=2, padx=10, pady=10)  # Changer l'emplacement selon les besoins
 
 
 
@@ -279,10 +308,18 @@ def ouvrir_boutique():
         bouton_validate.pack(pady=20)
 
 
+
+        
+        
+        
+
+
+
+
     # Ajouter un bouton pour modifier le produit dans la fenêtre des boutons
     def ajouter_bouton_modifier():
         bouton_modifier = Button(frame_buttons, text="Modifier produit", command=modifier_produit_window, font=("Courier", 12))
-        bouton_modifier.grid(row=3, column=3, padx=10, pady=10)  # Positionnez-le là où vous le souhaitez
+        bouton_modifier.grid(row=2, column=3, padx=10, pady=10)  # Positionnez-le là où vous le souhaitez
 
     # Appeler cette fonction pour ajouter le bouton "Modifier produit" au frame
     ajouter_bouton_modifier()

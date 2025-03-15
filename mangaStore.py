@@ -3,13 +3,9 @@ import csv
 
 class MangaStore:
     """
-    Classe pour gérer un magasin de mangas avec une base de données MySQL.
-    TODO:
-    - Exportation en CSV : Cliquez sur un bouton pour exporter les produits en format CSV.
-    ===================================================
     TODO:
     - Calcul du stock total : Calculer la valeur totale du stock en fonction des prix et des quantités.
-    - Affichage des produits les plus populaires : Trier les produits par leur quantité en stock.
+    - Affichage des produits les plus populaires(optionnel) : Trier les produits par leur quantité en stock.
     - Gestion des commandes (optionnel) : Suivi des produits commandés par les clients.
     - Gestion des utilisateurs (optionnel) : Système de gestion des utilisateurs (administrateurs, clients).
     - Recherche par nom de produit : Permettre à l'utilisateur de rechercher un produit par son nom.

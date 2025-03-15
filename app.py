@@ -39,6 +39,8 @@ canvas.create_image(image_width / 2, image_height / 2, image=image)
 canvas.image = image  # Important pour maintenir une référence à l'image
 canvas.pack()
 
+
+
 # Fonction pour afficher la boutique
 def ouvrir_boutique():
     """Fonction pour afficher la boutique dans la même fenêtre."""
@@ -48,6 +50,9 @@ def ouvrir_boutique():
 
     # Créer une instance de MangaStore
     store = MangaStore()
+
+    frame_bottom_buttons = Frame(frame_boutique, bg='#ab7e9c')
+    frame_bottom_buttons.pack(side=BOTTOM, fill=X, pady=10)  
 
     # Créer un frame pour l'image et les boutons dans la boutique
     frame_image_button = Frame(frame_boutique, bg='#ab7e9c')
@@ -121,19 +126,19 @@ def ouvrir_boutique():
 
     # Créer un Combobox pour la sélection de la catégorie
     label_category = Label(frame_buttons, text="", font=("Consolas", 20), bg='#ab7e9c')
-    label_category.grid(row=0, column=0, padx=10, pady=10, columnspan=2, sticky='n')
+    label_category.grid(row=0, column=2, padx=10, pady=10, columnspan=3, sticky='e')
 
     category_combobox = ttk.Combobox(frame_buttons, values=category_names, font=("Consolas", 12))
-    category_combobox.grid(row=0, column=1, padx=10, pady=10, columnspan=2, sticky='n')
+    category_combobox.grid(row=1, column=1, padx=10, pady=10, columnspan=2, sticky='n')
     category_combobox.set("catégorie")
 
     # Bouton pour appliquer le filtre
     bouton_filtrer = Button(frame_buttons, text="Appliquer Filtre", command=appliquer_filtre, font=("Courier", 12))
-    bouton_filtrer.grid(row=1, column=0, padx=10, pady=10, columnspan=2, sticky='n')
+    bouton_filtrer.grid(row=1, column=3, padx=10, pady=10, columnspan=3, sticky='n')
 
     # Créer un bouton pour afficher tous les produits
     bouton_afficher_tous = Button(frame_buttons, text="Afficher produits", command=lambda: afficher_produits_boutique(), font=("Courier", 12))
-    bouton_afficher_tous.grid(row=0, column=0, padx=10, pady=10, sticky='nw')
+    bouton_afficher_tous.grid(row=1, column=0, padx=10, pady=10, columnspan=1, sticky="n")
 
     def exporter_csv():
             # Créer une instance de MangaStore
@@ -159,14 +164,14 @@ def ouvrir_boutique():
             else:
                 print("Exportation annulée.")
     bouton_export_csv = Button(frame_buttons, text="Exporter CSV", command=exporter_csv, font=("Courier", 12))
-    bouton_export_csv.grid(row=2, column=4, padx=10, pady=10, columnspan=2, sticky='n')
+    bouton_export_csv.grid(row=0, column=4, padx=10, pady=10, columnspan=2, sticky='n')
 
     # Ajout d'un produit
     def ajouter_produit_window():
         """Fonction pour ajouter un produit"""
         add_window = Toplevel(window)
         add_window.title("Ajouter un produit")
-        add_window.geometry("400x400")
+        add_window.geometry("400x500")
 
         # Champs pour les informations du produit
         label_name = Label(add_window, text="Nom du produit:", font=("Consolas", 14))
@@ -210,20 +215,24 @@ def ouvrir_boutique():
         bouton_add.pack(pady=20)
 
     bouton_ajouter = Button(frame_buttons, text="Ajouter produit", command=ajouter_produit_window, font=("Courier", 12))
-    bouton_ajouter.grid(row=2, column=0, padx=10, pady=10)
+    bouton_ajouter.grid(row=0, column=0, padx=10, pady=10)
 
     # Suppression d'un produit
     def supprimer_produit_window():
-        """Fonction pour supprimer un produit"""
+        """Fonction pour supprimer un produit par son nom"""
         delete_window = Toplevel(window)
         delete_window.title("Supprimer un produit")
-        delete_window.geometry("400x400")
+        delete_window.geometry("400x500")
 
-        label_product_id = Label(delete_window, text="ID du produit à supprimer:", font=("Consolas", 14))
-        label_product_id.pack(pady=5)
-        entry_product_id = Entry(delete_window, font=("Consolas", 14))
-        entry_product_id.pack(pady=5)
+        # Label pour la sélection du produit à supprimer
+        label_product_name = Label(delete_window, text="Sélectionner le produit à supprimer:", font=("Consolas", 14))
+        label_product_name.pack(pady=5)
 
+        # Créer un combobox pour choisir le produit à supprimer
+        product_combobox = ttk.Combobox(delete_window, font=("Consolas", 14))
+        product_combobox.pack(pady=5)
+
+            
         def submit_delete():
             product_id = entry_product_id.get()
             store.supprimer_produit(product_id)
@@ -233,7 +242,7 @@ def ouvrir_boutique():
         bouton_delete.pack(pady=20)
 
     bouton_supprimer = Button(frame_buttons, text="Supprimer produit", command=supprimer_produit_window, font=("Courier", 12))
-    bouton_supprimer.grid(row=2, column=1, padx=10, pady=10)
+    bouton_supprimer.grid(row=0, column=1, padx=10, pady=10)
 
     # Fenêtre pour modifier un produit
     def modifier_produit_window():
@@ -255,6 +264,7 @@ def ouvrir_boutique():
 
         product_combobox = ttk.Combobox(modify_window, font=("Consolas", 14))
         product_combobox.pack(pady=5)
+
 
 
         # Fonction pour mettre à jour la liste des produits selon la catégorie choisie
@@ -306,19 +316,20 @@ def ouvrir_boutique():
     # Ajouter un bouton pour modifier le produit dans la fenêtre des boutons
     def ajouter_bouton_modifier():
         bouton_modifier = Button(frame_buttons, text="Modifier produit", command=modifier_produit_window, font=("Courier", 12))
-        bouton_modifier.grid(row=2, column=3, padx=10, pady=10)  # Positionnez-le là où vous le souhaitez
+        bouton_modifier.grid(row=0, column=3, padx=10, pady=10)  # Positionnez-le là où vous le souhaitez
 
     # Appeler cette fonction pour ajouter le bouton "Modifier produit" au frame
     ajouter_bouton_modifier()
 
     # Ajouter un bouton pour revenir à la fenêtre principale
+# Ajouter un bouton pour revenir à la fenêtre principale
     def revenir_main_window():
-        frame_boutique.pack_forget()  # Masquer la fenêtre boutique
-        frame_main.pack(expand=YES)   # Afficher la fenêtre principale
-        
-    bouton_retour = Button(frame_buttons, text="Retour", command=revenir_main_window, font=("Courier", 18))
-    bouton_retour.grid(row=3, column=0, columnspan=2, pady=10)
+            frame_boutique.pack_forget()  # Masquer la fenêtre boutique
+            frame_main.pack(expand=YES)   # Afficher la fenêtre principale
 
+        # Ajouter un bouton "Retour" dans le frame en bas
+    bouton_retour = Button(frame_bottom_buttons, text="Retour", command=revenir_main_window, font=("Courier", 18))
+    bouton_retour.pack(pady=10)  # Le bouton retour sera maintenant en bas du frame
     # Afficher la boutique
     frame_boutique.pack(expand=YES, fill=BOTH)
 

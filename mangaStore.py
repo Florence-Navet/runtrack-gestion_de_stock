@@ -18,7 +18,7 @@ class MangaStore:
             self.db = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",  # Remplacez par le mot de passe correct si nécessaire
+                password="",  
                 database="mangastore"
             )
             self.cursor = self.db.cursor()
@@ -176,7 +176,7 @@ class MangaStore:
             print(f"Erreur MySQL : {err}")
 
 
-# --- Interface CLI ---
+# --- Menu terminal---
 def menu():
     store = MangaStore()
     while True:

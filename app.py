@@ -219,7 +219,7 @@ def ouvrir_boutique():
 
     # Suppression d'un produit
     def supprimer_produit_window():
-        """Fenêtre pour supprimer un produit avec la même logique que la modification."""
+        """Fenêtre pour supprimer un produit ."""
         delete_window = Toplevel(window)
         delete_window.title("Supprimer un produit")
         delete_window.geometry("500x600")
@@ -278,7 +278,7 @@ def ouvrir_boutique():
     bouton_supprimer = Button(frame_buttons, text="Supprimer produit", command=supprimer_produit_window, font=("Courier", 12))
     bouton_supprimer.grid(row=0, column=1, padx=10, pady=10)
 
-    # Fenêtre pour modifier un produit
+
     def modifier_produit_window():
         """Fonction pour modifier un produit"""
         modify_window = Toplevel(window)
@@ -293,20 +293,26 @@ def ouvrir_boutique():
         category_combobox_current.pack(pady=5)
 
         # Sélectionner le produit à modifier dans la catégorie
-        label_current_product = Label(modify_window, text="Sélectionner le produit à modifier:", font=("Consolas", 14))
-        label_current_product.pack(pady=5)
+        label_current_name = Label(modify_window, text="Sélectionner le produit à modifier:", font=("Consolas", 14))
+        label_current_name.pack(pady=5)
 
         product_combobox = ttk.Combobox(modify_window, font=("Consolas", 14))
         product_combobox.pack(pady=5)
 
 
-
-        # Fonction pour mettre à jour la liste des produits selon la catégorie choisie
         def update_product_list(event=None):
             # Récupérer la catégorie actuelle
             selected_category = category_combobox_current.get()
+            print(f"Catégorie sélectionnée : {selected_category}")  # Affichage de la catégorie sélectionnée
+
             # Filtrer les produits selon la catégorie choisie
             filtered_products = store.filtrer_produits_par_categorie(selected_category)
+            
+            # Affichage des produits filtrés dans le terminal
+            print("Produits filtrés :")
+            for product in filtered_products:
+                print(product)  # Afficher chaque produit (id, nom, description, prix, quantité, catégorie)
+            
             # Mettre à jour les produits dans le combobox
             product_combobox['values'] = [p[1] for p in filtered_products]  # Affiche les noms des produits
             product_combobox.set('')  # Réinitialiser la sélection du produit
@@ -321,30 +327,56 @@ def ouvrir_boutique():
         category_combobox_new = ttk.Combobox(modify_window, values=category_names, font=("Consolas", 14))
         category_combobox_new.pack(pady=5)
 
-        # Fonction pour appliquer les modifications
+        # Nouveau prix
+        label_price = Label(modify_window, text="Prix du produit:", font=("Consolas", 14))
+        label_price.pack(pady=5)
+        entry_price = Entry(modify_window, font=("Consolas", 14))
+        entry_price.pack(pady=5)
+
+
         def submit_modification():
-            current_category = category_combobox_current.get()
+            current_category_name = category_combobox_current.get()
             current_product_name = product_combobox.get()
             new_category_name = category_combobox_new.get()
-            
-            # Trouver les IDs des catégories et produits
-            current_category = next((cat[1] for cat in categories if cat[0] == current_category), None)
+            new_price = entry_price.get()  # Récupération du nouveau prix
+
+            # Trouver les IDs des catégories
+            current_category_id = next((cat[1] for cat in categories if cat[0] == current_category_name), None)
             new_category_id = next((cat[1] for cat in categories if cat[0] == new_category_name), None)
-            
+
+            # Vérification si les catégories sont valides
+            if current_category_id is None or new_category_id is None:
+                print("Erreur : Catégorie invalide.")
+                return
+
             # Trouver le produit à partir de son nom dans la catégorie sélectionnée
-            current_product = next((p for p in store.filtrer_produits_par_categorie(current_category) if p[1] == current_product_name), None)
+            current_product = next((p for p in store.filtrer_produits_par_categorie(current_category_name) if p[1] == current_product_name), None)
+
+            # Ajout d'un affichage pour déboguer
+            print(f"Produit sélectionné : {current_product}")  # Afficher le produit sélectionné
+
             if current_product:
                 product_id = current_product[0]
-                
+
+                # Vérification et conversion du prix
+                try:
+                    new_price = float(new_price) if new_price else current_product[3]
+                except ValueError:
+                    print("Erreur : Le prix doit être un nombre valide.")
+                    return
+
                 # Modifier le produit
-                store.modifier_produit(product_id, current_product_name, current_product[2], current_product[3], current_product[4], new_category_id)
+                store.modifier_produit(product_id, current_product_name, current_product[2], new_price, current_product[4], new_category_id)
                 modify_window.destroy()  # Fermer la fenêtre après modification
             else:
                 print("Produit introuvable")
 
+
         # Ajouter un bouton pour valider la modification
         bouton_validate = Button(modify_window, text="Valider", command=submit_modification, font=("Consolas", 14))
         bouton_validate.pack(pady=20)
+
+
 
 
     # Ajouter un bouton pour modifier le produit dans la fenêtre des boutons
@@ -355,7 +387,7 @@ def ouvrir_boutique():
     # Appeler cette fonction pour ajouter le bouton "Modifier produit" au frame
     ajouter_bouton_modifier()
 
-    # Ajouter un bouton pour revenir à la fenêtre principale
+
 # Ajouter un bouton pour revenir à la fenêtre principale
     def revenir_main_window():
             frame_boutique.pack_forget()  # Masquer la fenêtre boutique

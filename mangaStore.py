@@ -18,7 +18,7 @@ class MangaStore:
             self.db = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",  
+                password="123456",  
                 database="mangastore"
             )
             self.cursor = self.db.cursor()
@@ -79,6 +79,7 @@ class MangaStore:
             print(f"Erreur MySQL : {err}")
             return []
 
+
     def ajouter_produit(self, name, description, price, quantity, category_id):
         """Ajoute un produit avec validation et debug."""
         try:
@@ -124,9 +125,24 @@ class MangaStore:
         
     def get_liste_noms_produits(self):
         """Récupère la liste des noms des produits depuis la base de données"""
-        self.cursor.execute("SELECT nom FROM produits")  # Ajuste la table et la colonne selon ton schéma
+        self.cursor.execute("SELECT nom FROM product")  # 
         result = self.cursor.fetchall()
         return [row[0] for row in result]  # Retourne une liste contenant uniquement les noms
+    
+    def get_prix_produits(self):
+        """recupere les prix"""
+        self.cursor("SELECT price FROM product") 
+        result = self.cursor.fetchall()
+        return [row[0] for row in result]
+    
+    def get_stock_produits(self):
+        """recupère les stocks"""
+        self.cursor("SELECT quantity FROM product")
+        result = self.cursor.fetchall()
+        return [row[0] for row in result]
+
+
+
 
 
     def fermer_connexion(self):

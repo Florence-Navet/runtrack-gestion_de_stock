@@ -18,7 +18,7 @@ class MangaStore:
             self.db = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="123456",  
+                password="",  
                 database="mangastore"
             )
             self.cursor = self.db.cursor()

@@ -99,18 +99,26 @@ class MangaStore:
             print(f"Erreur MySQL : {err}")
 
     def supprimer_produit(self, product_id):
-        """Supprime un produit de la base de données en fonction de son ID."""
+        """Supprime un produit de la base de données."""
         try:
+            # Vérifier si le produit existe
             self.cursor.execute("SELECT * FROM product WHERE id = %s", (product_id,))
-            if not self.cursor.fetchone():
-                print(f"Erreur : Produit avec ID {product_id} non trouvé.")
+            produit = self.cursor.fetchone()
+            
+            if not produit:
+                print(f"Erreur : Produit avec l'ID {product_id} non trouvé.")
                 return
 
+            # Suppression du produit
             self.cursor.execute("DELETE FROM product WHERE id = %s", (product_id,))
-            self.db.commit()
-            print(f"Produit avec ID {product_id} supprimé.")
+            self.db.commit()  # Applique les changements dans la base de données
+            print(f"Produit avec l'ID {product_id} supprimé avec succès.")
+        
         except mysql.connector.Error as err:
             print(f"Erreur MySQL : {err}")
+            self.db.rollback()  # Annule la transaction en cas d'erreur
+
+
 
     def afficher_produits(self):
         """Affiche tous les produits dans la base de données."""

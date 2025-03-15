@@ -40,7 +40,6 @@ canvas.image = image  # Important pour maintenir une référence à l'image
 canvas.pack()
 
 
-
 # Fonction pour afficher la boutique
 def ouvrir_boutique():
     """Fonction pour afficher la boutique dans la même fenêtre."""
@@ -83,7 +82,7 @@ def ouvrir_boutique():
     treeview.column('Stock', width=100)      # Colonne Stock 
     treeview.column('Catégorie', width=150)  # Colonne Catégorie 
 
-    # Augmenter la hauteur des lignes (en ajustant la police et le padding)
+    # Dimensionner hauteur lignes (en ajustant la police et le padding)
     style = ttk.Style()
     style.configure("Treeview",
                     font=("Arial", 12),  
@@ -200,7 +199,7 @@ def ouvrir_boutique():
         category_combobox_add = ttk.Combobox(add_window, values=category_names, font=("Consolas", 14))
         category_combobox_add.pack(pady=5)
 
-        def submit_produit():
+        def recup_produit():
             # Récupérer les informations et ajouter le produit à la base de données
             name = entry_name.get()
             description = entry_desc.get()
@@ -211,15 +210,16 @@ def ouvrir_boutique():
             store.ajouter_produit(name, description, price, quantity, category_id)
             add_window.destroy()  # Fermer la fenêtre d'ajout
 
-        bouton_add = Button(add_window, text="Ajouter", command=submit_produit, font=("Consolas", 14))
+        bouton_add = Button(add_window, text="Ajouter", command=recup_produit, font=("Consolas", 14))
         bouton_add.pack(pady=20)
 
     bouton_ajouter = Button(frame_buttons, text="Ajouter produit", command=ajouter_produit_window, font=("Courier", 12))
     bouton_ajouter.grid(row=0, column=0, padx=10, pady=10)
 
+
     # Suppression d'un produit
     def supprimer_produit_window():
-        """Fenêtre pour supprimer un produit ."""
+        """Fenêtre pour supprimer un produit."""
         delete_window = Toplevel(window)
         delete_window.title("Supprimer un produit")
         delete_window.geometry("500x600")
@@ -239,44 +239,70 @@ def ouvrir_boutique():
         product_combobox.pack(pady=5)
 
         # Fonction pour mettre à jour la liste des produits en fonction de la catégorie choisie
-        def update_product_list(event=None):
+        def mise_a_jour_liste_produits(event=None):
             selected_category = category_combobox.get()
-            filtered_products = store.filtrer_produits_par_categorie(selected_category)
-            product_combobox['values'] = [p[1] for p in filtered_products]
-            product_combobox.set('')
+            # Vérifier si une catégorie est sélectionnée
+            if selected_category:
+                filtered_products = store.filtrer_produits_par_categorie(selected_category)
+                product_combobox['values'] = [p[1] for p in filtered_products]  # Remplir le combobox avec les noms des produits
+                product_combobox.set('')  # Réinitialiser la sélection du produit
+            else:
+                product_combobox['values'] = []
+                product_combobox.set('')
 
-        category_combobox.bind("<<ComboboxSelected>>", update_product_list)
+        category_combobox.bind("<<ComboboxSelected>>", mise_a_jour_liste_produits)
 
         # Fonction pour supprimer le produit sélectionné
-        def submit_delete():
+        def envoi_suppression():
             selected_category = category_combobox.get()
             selected_product_name = product_combobox.get()
-            
+
+            # Vérification des sélections
             if not selected_category or not selected_product_name:
                 label_info.config(text="Veuillez sélectionner un produit", fg="red")
                 return
 
+            # Récupérer l'ID de la catégorie sélectionnée
             category_id = next((cat[1] for cat in categories if cat[0] == selected_category), None)
-            product = next((p for p in store.filtrer_produits_par_categorie(category_id) if p[1] == selected_product_name), None)
+            
+            # Vérification si l'ID de catégorie est valide
+            if not category_id:
+                label_info.config(text="Catégorie invalide", fg="red")
+                return
+            
+            # Filtrer les produits de la catégorie sélectionnée
+            filtered_products = store.filtrer_produits_par_categorie(selected_category)
+            
+            # Trouver le produit en fonction de son nom
+            product = next((p for p in filtered_products if p[1] == selected_product_name), None)
             
             if product:
-                store.supprimer_produit(product[0])
+                product_id = product[0]  # L'ID du produit est le premier élément du tuple
+                print(f"Suppression du produit : {selected_product_name}, ID : {product_id}")  # Débogage
+
+                # Appel à la méthode de suppression
+                store.supprimer_produit(product_id)
+                
+                # Mise à jour du message de succès
                 label_info.config(text="Produit supprimé avec succès", fg="green")
                 delete_window.after(1000, delete_window.destroy)  # Fermer après 1 seconde
             else:
                 label_info.config(text="Produit introuvable", fg="red")
 
         # Bouton de suppression
-        bouton_delete = Button(delete_window, text="Supprimer", command=submit_delete, font=("Consolas", 14))
+        bouton_delete = Button(delete_window, text="Supprimer", command=envoi_suppression, font=("Consolas", 14))
         bouton_delete.pack(pady=20)
 
         # Label pour les messages d'erreur/succès
         label_info = Label(delete_window, text="", font=("Consolas", 12))
         label_info.pack(pady=5)
 
-
+    # Bouton pour ouvrir la fenêtre de suppression
     bouton_supprimer = Button(frame_buttons, text="Supprimer produit", command=supprimer_produit_window, font=("Courier", 12))
     bouton_supprimer.grid(row=0, column=1, padx=10, pady=10)
+
+
+
 
 
     def modifier_produit_window():
@@ -300,7 +326,7 @@ def ouvrir_boutique():
         product_combobox.pack(pady=5)
 
 
-        def update_product_list(event=None):
+        def mise_a_jour_liste_produit(event=None):
             # Récupérer la catégorie actuelle
             selected_category = category_combobox_current.get()
             print(f"Catégorie sélectionnée : {selected_category}")  # Affichage de la catégorie sélectionnée
@@ -318,7 +344,7 @@ def ouvrir_boutique():
             product_combobox.set('')  # Réinitialiser la sélection du produit
 
         # Lier la mise à jour de la liste des produits à la sélection de la catégorie
-        category_combobox_current.bind("<<ComboboxSelected>>", update_product_list)
+        category_combobox_current.bind("<<ComboboxSelected>>", mise_a_jour_liste_produit)
 
         # Sélectionner la nouvelle catégorie
         label_new_category = Label(modify_window, text="Sélectionner la nouvelle catégorie:", font=("Consolas", 14))
@@ -334,7 +360,7 @@ def ouvrir_boutique():
         entry_price.pack(pady=5)
 
 
-        def submit_modification():
+        def envoi_modification():
             current_category_name = category_combobox_current.get()
             current_product_name = product_combobox.get()
             new_category_name = category_combobox_new.get()
@@ -373,7 +399,7 @@ def ouvrir_boutique():
 
 
         # Ajouter un bouton pour valider la modification
-        bouton_validate = Button(modify_window, text="Valider", command=submit_modification, font=("Consolas", 14))
+        bouton_validate = Button(modify_window, text="Valider", command=envoi_modification, font=("Consolas", 14))
         bouton_validate.pack(pady=20)
 
 

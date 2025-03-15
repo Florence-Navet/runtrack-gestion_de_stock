@@ -209,6 +209,7 @@ def ouvrir_boutique():
             category_id = next((cat[1] for cat in categories if cat[0] == category_name), None)
             store.ajouter_produit(name, description, price, quantity, category_id)
             add_window.destroy()  # Fermer la fenêtre d'ajout
+            afficher_produits_boutique(category_name)
 
         bouton_add = Button(add_window, text="Ajouter", command=recup_produit, font=("Consolas", 14))
         bouton_add.pack(pady=20)
@@ -286,6 +287,7 @@ def ouvrir_boutique():
                 # Mise à jour du message de succès
                 label_info.config(text="Produit supprimé avec succès", fg="green")
                 delete_window.after(1000, delete_window.destroy)  # Fermer après 1 seconde
+                afficher_produits_boutique()
             else:
                 label_info.config(text="Produit introuvable", fg="red")
 
@@ -394,6 +396,7 @@ def ouvrir_boutique():
                 # Modifier le produit
                 store.modifier_produit(product_id, current_product_name, current_product[2], new_price, current_product[4], new_category_id)
                 modify_window.destroy()  # Fermer la fenêtre après modification
+                afficher_produits_boutique()
             else:
                 print("Produit introuvable")
 

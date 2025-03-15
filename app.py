@@ -71,17 +71,17 @@ def ouvrir_boutique():
         treeview.heading(col, text=col)
 
     # Définir la largeur des colonnes
-    treeview.column('ID', width=80)          # Colonne ID plus petite
+    treeview.column('ID', width=80)          # Colonne ID 
     treeview.column('Nom', width=200)        # Colonne Nom
     treeview.column('Description', width=300)# Colonne Description
-    treeview.column('Prix', width=100)       # Colonne Prix plus petite
-    treeview.column('Stock', width=100)      # Colonne Stock plus petite
-    treeview.column('Catégorie', width=150)  # Colonne Catégorie plus petite
+    treeview.column('Prix', width=100)       # Colonne Prix 
+    treeview.column('Stock', width=100)      # Colonne Stock 
+    treeview.column('Catégorie', width=150)  # Colonne Catégorie 
 
     # Augmenter la hauteur des lignes (en ajustant la police et le padding)
     style = ttk.Style()
     style.configure("Treeview",
-                    font=("Arial", 12),  # Augmenter la taille de la police pour des cellules plus hautes
+                    font=("Arial", 12),  
                     rowheight=30)  # Ajuster la hauteur des lignes (en pixels)
 
     # Appliquer le style au Treeview
@@ -256,11 +256,6 @@ def ouvrir_boutique():
         product_combobox = ttk.Combobox(modify_window, font=("Consolas", 14))
         product_combobox.pack(pady=5)
 
-        # # Ajouter un bouton pour modifier un produit
-        # bouton_modifier = Button(frame_buttons, text="Modifier produit", command=modifier_produit_window, font=("Courier", 12))
-        # bouton_modifier.grid(row=3, column=2, padx=10, pady=10)  # Changer l'emplacement selon les besoins
-
-
 
         # Fonction pour mettre à jour la liste des produits selon la catégorie choisie
         def update_product_list(event=None):
@@ -306,14 +301,6 @@ def ouvrir_boutique():
         # Ajouter un bouton pour valider la modification
         bouton_validate = Button(modify_window, text="Valider", command=submit_modification, font=("Consolas", 14))
         bouton_validate.pack(pady=20)
-
-
-
-        
-        
-        
-
-
 
 
     # Ajouter un bouton pour modifier le produit dans la fenêtre des boutons

@@ -18,7 +18,7 @@ class MangaStore:
             self.db = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",  
+                password="123456",  
                 database="mangastore"
             )
             self.cursor = self.db.cursor()
@@ -121,6 +121,13 @@ class MangaStore:
         except mysql.connector.Error as err:
             print(f"Erreur MySQL : {err}")
             return []
+        
+    def get_liste_noms_produits(self):
+        """Récupère la liste des noms des produits depuis la base de données"""
+        self.cursor.execute("SELECT nom FROM produits")  # Ajuste la table et la colonne selon ton schéma
+        result = self.cursor.fetchall()
+        return [row[0] for row in result]  # Retourne une liste contenant uniquement les noms
+
 
     def fermer_connexion(self):
         """Ferme la connexion à la base de données."""

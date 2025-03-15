@@ -18,7 +18,7 @@ class MangaStore:
             self.db = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="123456",  
+                password="",  
                 database="mangastore"
             )
             self.cursor = self.db.cursor()
@@ -148,10 +148,6 @@ class MangaStore:
         self.cursor("SELECT quantity FROM product")
         result = self.cursor.fetchall()
         return [row[0] for row in result]
-
-
-
-
 
     def fermer_connexion(self):
         """Ferme la connexion à la base de données."""

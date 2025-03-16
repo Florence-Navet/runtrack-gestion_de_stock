@@ -362,43 +362,93 @@ def ouvrir_boutique():
         entry_price.pack(pady=5)
 
 
+        #nouvelle quantité
+        label_quantity = Label(modify_window, text="Quantité du produit:", font=("Consolas", 14))
+        label_quantity.pack(pady=5)
+        entry_quantity = Entry(modify_window, font=("Consolas", 14))
+        entry_quantity.pack(pady=5)
+
+
         def envoi_modification():
             current_category_name = category_combobox_current.get()
             current_product_name = product_combobox.get()
             new_category_name = category_combobox_new.get()
-            new_price = entry_price.get()  # Récupération du nouveau prix
+            new_price = entry_price.get()
+            new_quantity = entry_quantity.get()
 
             # Trouver les IDs des catégories
             current_category_id = next((cat[1] for cat in categories if cat[0] == current_category_name), None)
             new_category_id = next((cat[1] for cat in categories if cat[0] == new_category_name), None)
 
-            # Vérification si les catégories sont valides
             if current_category_id is None or new_category_id is None:
                 print("Erreur : Catégorie invalide.")
                 return
 
-            # Trouver le produit à partir de son nom dans la catégorie sélectionnée
+            # Trouver le produit sélectionné
             current_product = next((p for p in store.filtrer_produits_par_categorie(current_category_name) if p[1] == current_product_name), None)
 
-            # Ajout d'un affichage pour déboguer
-            print(f"Produit sélectionné : {current_product}")  # Afficher le produit sélectionné
+            print(f"Produit sélectionné : {current_product}")
 
             if current_product:
                 product_id = current_product[0]
 
-                # Vérification et conversion du prix
+                # Vérification et conversion des valeurs
                 try:
                     new_price = float(new_price) if new_price else current_product[3]
                 except ValueError:
                     print("Erreur : Le prix doit être un nombre valide.")
                     return
 
-                # Modifier le produit
-                store.modifier_produit(product_id, current_product_name, current_product[2], new_price, current_product[4], new_category_id)
-                modify_window.destroy()  # Fermer la fenêtre après modification
+                try:
+                    new_quantity = int(new_quantity) if new_quantity else current_product[4]
+                except ValueError:
+                    print("Erreur : La quantité doit être un nombre entier valide.")
+                    return
+
+                # Modifier le produit avec la nouvelle quantité
+                store.modifier_produit(product_id, current_product_name, current_product[2], new_price, new_quantity, new_category_id)
+                modify_window.destroy()
                 afficher_produits_boutique()
             else:
                 print("Produit introuvable")
+                def envoi_modification():
+                    current_category_name = category_combobox_current.get()
+                    current_product_name = product_combobox.get()
+                    new_category_name = category_combobox_new.get()
+                    new_price = entry_price.get()  # Récupération du nouveau prix
+                    new_quantity = entry_quantity.get()
+
+                    # Trouver les IDs des catégories
+                    current_category_id = next((cat[1] for cat in categories if cat[0] == current_category_name), None)
+                    new_category_id = next((cat[1] for cat in categories if cat[0] == new_category_name), None)
+
+                    # Vérification si les catégories sont valides
+                    if current_category_id is None or new_category_id is None:
+                        print("Erreur : Catégorie invalide.")
+                        return
+
+                    # Trouver le produit à partir de son nom dans la catégorie sélectionnée
+                    current_product = next((p for p in store.filtrer_produits_par_categorie(current_category_name) if p[1] == current_product_name), None)
+
+                    # Ajout d'un affichage pour déboguer
+                    print(f"Produit sélectionné : {current_product}")  # Afficher le produit sélectionné
+
+                    if current_product:
+                        product_id = current_product[0]
+
+                        # Vérification et conversion du prix
+                        try:
+                            new_price = float(new_price) if new_price else current_product[3]
+                        except ValueError:
+                            print("Erreur : Le prix doit être un nombre valide.")
+                            return
+
+                        # Modifier le produit
+                        store.modifier_produit(product_id, current_product_name, current_product[2], new_price, current_product[4], new_category_id)
+                        modify_window.destroy()  # Fermer la fenêtre après modification
+                        afficher_produits_boutique()
+                    else:
+                        print("Produit introuvable")
 
 
         # Ajouter un bouton pour valider la modification
